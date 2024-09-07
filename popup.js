@@ -1,7 +1,20 @@
-document.addEventListener('DOMContentLoaded', function() {
-  console.log("DOM content loaded");
+console.log('Popup script loaded');
 
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM content loaded');
+  
   const generateButton = document.getElementById('generateTweet');
+  console.log('Generate button:', generateButton);
+
+  if (generateButton) {
+    generateButton.addEventListener('click', function() {
+      console.log('Generate button clicked');
+      // ... rest of the click handler ...
+    });
+  } else {
+    console.error('Generate button not found');
+  }
+
   const tweetResponse = document.getElementById('tweetResponse');
   const copyButton = document.getElementById('copyToClipboard');
   const errorElement = document.getElementById('error');

@@ -1,3 +1,5 @@
+console.log('Content script loaded');
+
 function extractTweet() {
   const tweetElement = document.querySelector('[data-testid="tweetText"]');
   return tweetElement ? tweetElement.textContent.trim() : null;

@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "A Chrome extension for Naval's tweets",
   "scripts": {
-    "build": "webpack --mode production"
+    "clean": "rm -rf dist",
+    "build": "npm run clean && webpack --mode production",
+    "watch": "webpack --mode development --watch"
   },
   "dependencies": {},
   "devDependencies": {

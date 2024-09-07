@@ -1,3 +1,5 @@
+console.log('Background script loaded');
+
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 let chatHistory = [];
