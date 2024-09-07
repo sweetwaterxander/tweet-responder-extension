@@ -1,0 +1,269 @@
+body {
+  width: 350px;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 10px;
+  background-color: #1F2937; /* Darker background for the popup */
+  color: white;
+}
+
+.naval-tweet-responder {
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  background-color: #111827; /* Darker card background */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #111827; /* Matching card background */
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  font-weight: bold;
+}
+
+.settings-button {
+  background: none;
+  border: none;
+  color: #9CA3AF; /* Light gray for the settings icon */
+  cursor: pointer;
+  padding: 4px;
+}
+
+.settings-button:hover {
+  color: white;
+}
+
+.card-content {
+  padding: 5px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: -15px;
+}
+
+button {
+  padding: 8px 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.generate-button {
+  background-color: #2563EB; /* Blue color for the generate button */
+  color: white;
+  font-weight: bold;
+}
+
+.generate-button:hover {
+  background-color: #1D4ED8; /* Darker blue on hover */
+}
+
+.copy-button {
+  background-color: #4B5563; /* Gray color for the copy button */
+  color: white;
+  font-weight: bold;
+}
+
+.copy-button:hover {
+  background-color: #374151; /* Darker gray on hover */
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+textarea {
+  height: 96px;
+  resize: none;
+  background-color: #262d38; /* Darker background for textarea */
+  color: white;
+  border: 1px solid #4B5563; /* Slightly lighter border */
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.error {
+  color: #EF4444; /* Red color for error messages */
+  font-size: 14px;
+  margin: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.edit-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  position: relative;
+  margin-bottom: -10px; /* Reduced from 8px to 4px */
+}
+
+.edit-button {
+  flex: 1;
+  background-color: #4B5563; /* Gray color for edit buttons */
+  color: white;
+  font-size: 12px;
+  padding: 6px 8px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 48px; /* Adjust this value as needed */
+  line-height: 1.2;
+}
+
+.edit-button:hover {
+  background-color: #374151; /* Darker gray on hover */
+}
+
+.textarea-container {
+  position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #9CA3AF; /* Light gray for spinner */
+  border-top: 4px solid #2563EB; /* Blue color for spinner */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Add any additional styles you need for your components */
+
+/* Add these styles to your existing CSS */
+
+button[disabled] {
+  position: relative;
+}
+
+button[disabled]:hover::before {
+  content: attr(title);
+  position: absolute;
+  background: #4B5563;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px;
+  max-width: 200px; /* Adjust this value as needed */
+  width: max-content;
+}
+
+button[disabled]:hover::before {
+  opacity: 1;
+}
+
+/* Add this new rule to create a stacking context for the buttons */
+.edit-buttons, .copy-button {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure the hover message is always on top */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Remove or comment out this rule if it exists */
+/*
+button[disabled]::before {
+  left: var(--mouse-x, 0);
+  top: var(--mouse-y, 0);
+  transform: translate(10px, 10px);
+}
+*/
+
+/* Add these new rules */
+.edit-buttons {
+  position: relative;
+}
+
+.edit-button:first-child:hover::before {
+  left: 0;
+  transform: translateX(0);
+}
+
+.edit-button:last-child:hover::before {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+}
+
+/* Replace the previous .edit-button:first-child and .edit-button:last-child rules with these */
+.first-edit-button:hover::before {
+  left: 0;
+  transform: translateX(0);
+}
+
+.last-edit-button:hover::before {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+}
+/* Add this new rule to remove the margin from the last .edit-buttons div */
+.edit-buttons:last-of-type {
+  margin-bottom: 0;
+}

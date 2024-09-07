@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tweet Responder</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div id="root" class="naval-tweet-responder">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Tweet Responder</h2>
+        <button id="settingsButton" class="settings-button">
+          <i class="fas fa-cog"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+      <div class="card-content">
+        <button id="generateTweet" class="generate-button">Generate Tweet</button>
+        <div class="textarea-container">
+          <textarea id="tweetResponse" readonly placeholder="Generated tweet will appear here..."></textarea>
+          <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner"></div>
+          </div>
+        </div>
+        <div class="edit-buttons">
+          <button id="makeConcise" class="edit-button">Make more concise</button>
+          <button id="moreConservative" class="edit-button">More conservative</button>
+          <button id="moreLiberal" class="edit-button">More liberal</button>
+        </div>
+        <div class="edit-buttons">
+          <button id="moreUnique" class="edit-button">More unique</button>
+          <button id="moreContrarian" class="edit-button">More<br>contrarian</button>
+          <button id="moreAgreeable" class="edit-button">More agreeable</button>
+        </div>
+        <button id="copyToClipboard" class="copy-button">Copy to Clipboard</button>
+        <p id="error" class="error"></p>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

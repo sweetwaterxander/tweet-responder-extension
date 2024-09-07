@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Naval Tweet Responder",
+  "version": "1.0",
+  "description": "Generate responses to tweets in the style of Naval Ravikant",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://api.openai.com/*"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.bundle.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://twitter.com/*", "https://x.com/*"],
+      "js": ["content.bundle.js"]
+    }
+  ]
+}
