@@ -253,36 +253,53 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
-  // Add this after you define the editButtons array
-  const firstEditButton = editButtons[0];
-  const lastEditButton = editButtons[editButtons.length - 1];
+  // Add this code at the beginning of your existing popup.js file
+  const replyTab = document.getElementById('replyTab');
+  const newTweetTab = document.getElementById('newTweetTab');
+  const replyContent = document.getElementById('replyContent');
+  const newTweetContent = document.getElementById('newTweetContent');
 
-  // Add these class names to the first and last edit buttons
-  firstEditButton.classList.add('first-edit-button');
-  lastEditButton.classList.add('last-edit-button');
+  const fileUpload = document.getElementById('fileUpload');
+  const uploadButton = document.getElementById('uploadButton');
+  const linkInput = document.getElementById('linkInput');
+  const singleTweetButton = document.getElementById('singleTweetButton');
+  const threadButton = document.getElementById('threadButton');
 
-  // Add this at the end of your DOMContentLoaded event listener
-  editButtons.forEach(button => {
-    button.addEventListener('mousemove', (e) => {
-      if (button.disabled) {
-        const rect = button.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        button.style.setProperty('--mouse-x', `${e.clientX}px`);
-        button.style.setProperty('--mouse-y', `${e.clientY}px`);
-      }
-    });
-  });
-
-  function updateHoverPosition(e, button) {
-    // Remove this function as we no longer need to track mouse position
+  function switchTab(tabName) {
+    if (tabName === 'reply') {
+      replyTab.classList.add('active');
+      newTweetTab.classList.remove('active');
+      replyContent.classList.add('active');
+      replyContent.style.display = 'flex';
+      newTweetContent.classList.remove('active');
+      newTweetContent.style.display = 'none';
+    } else if (tabName === 'new') {
+      newTweetTab.classList.add('active');
+      replyTab.classList.remove('active');
+      newTweetContent.classList.add('active');
+      newTweetContent.style.display = 'flex';
+      replyContent.classList.remove('active');
+      replyContent.style.display = 'none';
+    }
   }
 
-  editButtons.forEach(button => {
-    // Remove these event listeners as they're no longer needed
-    // button.addEventListener('mousemove', (e) => updateHoverPosition(e, button));
-    // button.addEventListener('mouseenter', (e) => updateHoverPosition(e, button));
+  replyTab.addEventListener('click', () => switchTab('reply'));
+  newTweetTab.addEventListener('click', () => switchTab('new'));
+
+  // Ensure the Tweet Response tab is open by default
+  switchTab('reply');
+
+  uploadButton.addEventListener('click', () => fileUpload.click());
+
+  singleTweetButton.addEventListener('click', () => {
+    singleTweetButton.classList.add('active');
+    threadButton.classList.remove('active');
   });
 
-  // Remove any other code that sets --mouse-x and --mouse-y CSS variables
+  threadButton.addEventListener('click', () => {
+    threadButton.classList.add('active');
+    singleTweetButton.classList.remove('active');
+  });
+
+  // ... rest of your existing code ...
 });

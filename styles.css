@@ -16,6 +16,7 @@ body {
   background-color: #111827; /* Darker card background */
   border-radius: 8px;
   overflow: hidden;
+  min-height: 400px; /* Adjust this value as needed */
 }
 
 .card-header {
@@ -46,11 +47,10 @@ body {
 }
 
 .card-content {
-  padding: 5px 16px 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: -15px;
 }
 
 button {
@@ -239,6 +239,7 @@ button[disabled]::before {
 /* Add these new rules */
 .edit-buttons {
   position: relative;
+  margin-bottom: -4px;
 }
 
 .edit-button:first-child:hover::before {
@@ -266,4 +267,88 @@ button[disabled]::before {
 /* Add this new rule to remove the margin from the last .edit-buttons div */
 .edit-buttons:last-of-type {
   margin-bottom: 0;
+}
+
+/* Add these new styles at the end of your existing CSS file */
+
+.tab-header {
+  display: flex;
+  border-bottom: 1px solid #4a5568;
+}
+
+.tab-button {
+  flex: 1;
+  background-color: transparent;
+  color: #a0aec0;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.tab-button:hover {
+  background-color: #4a5568;
+}
+
+.tab-button.active {
+  background-color: #4a5568;
+  color: white;
+}
+
+.file-upload {
+  display: flex;
+}
+
+#fileUpload {
+  display: none;
+}
+
+.upload-button {
+  background-color: #4B5563;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+#linkInput {
+  width: 100%;
+  padding: 8px;
+  background-color: #374151;
+  color: white;
+  border: 1px solid #4B5563;
+  border-radius: 4px;
+}
+
+.tweet-type-selector {
+  display: flex;
+}
+
+.tweet-type-button {
+  flex: 1;
+  background-color: #4B5563;
+  color: white;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.tweet-type-button.active {
+  background-color: #10B981;
+  border: 2px solid #059669;
+}
+
+/* Ensure consistent styling for both tabs */
+#replyContent, #newTweetContent {
+  display: none;
+}
+
+#replyContent.active, #newTweetContent.active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: -15px;
 }
