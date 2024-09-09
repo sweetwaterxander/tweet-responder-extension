@@ -3,8 +3,8 @@
   "name": "Naval Tweet Responder",
   "version": "1.0",
   "description": "Generate responses to tweets in the style of Naval Ravikant",
-  "permissions": ["activeTab", "storage"],
-  "host_permissions": ["https://api.openai.com/*"],
+  "permissions": ["activeTab", "storage", "http://*", "https://*"],
+  "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup.html"
   },
@@ -16,5 +16,14 @@
       "matches": ["https://twitter.com/*", "https://x.com/*"],
       "js": ["content.bundle.js"]
     }
-  ]
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["pdf.min.js", "pdf.worker.min.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
 }

@@ -18,3 +18,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return true; // Indicates that the response is asynchronous
 });
+
+// Add this message listener to your content.js file
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "extractContent") {
+    sendResponse({ content: document.body.innerText });
+  }
+  // ... other message handlers ...
+});

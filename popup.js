@@ -325,20 +325,47 @@ document.addEventListener('DOMContentLoaded', function() {
     copyNewTweet.disabled = !enabled;
   }
 
+  async function extractLinkContent(url) {
+    try {
+      const response = await fetch(url);
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const content = doc.body.innerText;
+      console.log('Extracted link content:', content.substring(0, 100) + '...');
+      return content;
+    } catch (error) {
+      console.error('Error extracting link content:', error);
+      return `Unable to extract content from link: ${url}`;
+    }
+  }
+
   generateNewTweet.addEventListener('click', async () => {
     setNewTweetLoading(true);
     newTweetError.textContent = '';
     newTweetResponse.value = '';
 
-    let content = linkInput.value.trim();
+    let content = '';
+
+    console.log('Uploaded file:', uploadedFile);
+    console.log('Link input:', linkInput.value);
+
     if (uploadedFile) {
-      const fileContent = await readFileContent(uploadedFile);
-      content += '\n\n' + fileContent;
+      content = await readFileContent(uploadedFile);
+      console.log('File content:', content.substring(0, 100) + '...');
+    }
+
+    if (linkInput.value.trim()) {
+      const linkContent = await extractLinkContent(linkInput.value.trim());
+      content += '\n\n' + linkContent;
+      console.log('Link content:', linkContent.substring(0, 100) + '...');
     }
 
     const prompt = isSingleTweet
-      ? `Please write a single 280 character tweet based on the following information: ${content}`
-      : `Please create a thread from the following information. Do not make the thread longer than it needs to be, and use only 280 character tweets. Write the thread sequentially, but separate the threads by "%TWEET%". ${content}`;
+      ? `Please write a single 280 character tweet based on the content from the following website extraction. Make sure to exclude content that is not relevant to broader message/article included below: ${content}`
+      : `Please create a thread from following website extraction. Make sure to exclude content that is not relevant to broader message/article included below. Do not make the thread longer than it needs to be, and use only 280 character tweets. Write the thread sequentially, but separate the threads by "%TWEET%". ${content}`;
+
+    console.log('Final prompt:', prompt.substring(0, 100) + '...');
 
     try {
       const response = await chrome.runtime.sendMessage({
@@ -346,6 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
         prompt: prompt,
         isSingleTweet: isSingleTweet
       });
+
+      console.log('Response from background script:', response);
 
       if (response.error) {
         throw new Error(response.error);
@@ -357,6 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
         displayThread(response.tweets);
       }
     } catch (error) {
+      console.error('Error generating tweet:', error);
       newTweetError.textContent = `Error: ${error.message}`;
     } finally {
       setNewTweetLoading(false);
@@ -407,9 +437,44 @@ document.addEventListener('DOMContentLoaded', function() {
   async function readFileContent(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (event) => resolve(event.target.result);
+      reader.onload = async (event) => {
+        let content = '';
+        if (file.type === 'application/pdf') {
+          try {
+            const typedArray = new Uint8Array(event.target.result);
+            const pdf = await pdfjsLib.getDocument({data: typedArray}).promise;
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const textContent = await page.getTextContent();
+              content += textContent.items.map(item => item.str).join(' ') + '\n';
+            }
+          } catch (error) {
+            console.error('Error processing PDF:', error);
+            content = `Unable to extract text from PDF: ${error.message}`;
+          }
+        } else if (file.type.includes('word')) {
+          try {
+            const arrayBuffer = event.target.result;
+            const result = await mammoth.extractRawText({arrayBuffer});
+            content = result.value;
+          } catch (error) {
+            console.error('Error processing Word document:', error);
+            content = `Unable to extract text from Word document: ${error.message}`;
+          }
+        } else if (file.type.startsWith('text/')) {
+          content = event.target.result;
+        } else {
+          content = `Unable to extract text from file type: ${file.type}`;
+        }
+        resolve(content);
+      };
       reader.onerror = (error) => reject(error);
-      reader.readAsText(file);
+      
+      if (file.type === 'application/pdf' || file.type.includes('word')) {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsText(file);
+      }
     });
   }
 

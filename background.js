@@ -27,6 +27,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("Generating new tweet:", request.prompt);
     generateNewTweet(request.prompt, request.isSingleTweet).then(sendResponse);
     return true; // Indicates that the response is asynchronous
+  } else if (request.action === "extractLinkContent") {
+    fetchUrl(request.url)
+      .then(content => sendResponse({ content }))
+      .catch(error => sendResponse({ error: error.message }));
+    return true; // Indicates that the response is asynchronous
   }
 });
 
@@ -162,5 +167,22 @@ async function callOpenAI(messages) {
   } catch (error) {
     console.error('Error in callOpenAI:', error);
     throw error;
+  }
+}
+
+function extractTextContent(doc) {
+  return doc.body.innerText;
+}
+
+async function fetchUrl(url) {
+  try {
+    const response = await fetch(url);
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    return doc.body.innerText;
+  } catch (error) {
+    console.error('Error fetching URL:', error);
+    throw new Error('Failed to fetch');
   }
 }
