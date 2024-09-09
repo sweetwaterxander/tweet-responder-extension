@@ -23,6 +23,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("Chat history reset");
     sendResponse({success: true});
     return true;
+  } else if (request.action === "generateNewTweet") {
+    console.log("Generating new tweet:", request.prompt);
+    generateNewTweet(request.prompt, request.isSingleTweet).then(sendResponse);
+    return true; // Indicates that the response is asynchronous
   }
 });
 
@@ -96,6 +100,28 @@ async function editTweet(instruction) {
   } catch (error) {
     console.error('Error in editTweet:', error);
     return { action: "error", message: "Failed to edit response: " + error.message };
+  }
+}
+
+async function generateNewTweet(prompt, isSingleTweet) {
+  const messages = [
+    { role: "system", content: "You are a professional Tweeter. Please generate tweets based on the given information." },
+    { role: "user", content: prompt }
+  ];
+
+  try {
+    const response = await callOpenAI(messages);
+    console.log("Received response from OpenAI:", response);
+
+    if (isSingleTweet) {
+      return { tweet: response.trim() };
+    } else {
+      const tweets = response.split('%TWEET%').map(tweet => tweet.trim()).filter(tweet => tweet);
+      return { tweets: tweets };
+    }
+  } catch (error) {
+    console.error('Error in generateNewTweet:', error);
+    return { error: "Failed to generate tweet: " + error.message };
   }
 }
 

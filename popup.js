@@ -264,6 +264,166 @@ document.addEventListener('DOMContentLoaded', function() {
   const linkInput = document.getElementById('linkInput');
   const singleTweetButton = document.getElementById('singleTweetButton');
   const threadButton = document.getElementById('threadButton');
+  const generateNewTweet = document.getElementById('generateNewTweet');
+  const newTweetResponse = document.getElementById('newTweetResponse');
+  const newTweetLoadingOverlay = document.getElementById('newTweetLoadingOverlay');
+  const copyNewTweet = document.getElementById('copyNewTweet');
+  const newTweetError = document.getElementById('newTweetError');
+
+  const newEditButtons = [
+    document.getElementById('newMakeConcise'),
+    document.getElementById('newMoreConservative'),
+    document.getElementById('newMoreLiberal'),
+    document.getElementById('newMoreUnique'),
+    document.getElementById('newMoreContrarian'),
+    document.getElementById('newMoreAgreeable')
+  ];
+
+  let uploadedFile = null;
+  let isSingleTweet = true;
+
+  function updateGenerateButton() {
+    generateNewTweet.disabled = !(uploadedFile || linkInput.value.trim());
+  }
+
+  fileUpload.addEventListener('change', (event) => {
+    uploadedFile = event.target.files[0];
+    updateGenerateButton();
+  });
+
+  linkInput.addEventListener('input', updateGenerateButton);
+
+  uploadButton.addEventListener('click', () => fileUpload.click());
+
+  singleTweetButton.addEventListener('click', () => {
+    singleTweetButton.classList.add('active');
+    threadButton.classList.remove('active');
+    isSingleTweet = true;
+  });
+
+  threadButton.addEventListener('click', () => {
+    threadButton.classList.add('active');
+    singleTweetButton.classList.remove('active');
+    isSingleTweet = false;
+  });
+
+  function setNewTweetLoading(isLoading) {
+    newTweetLoadingOverlay.style.display = isLoading ? 'flex' : 'none';
+    generateNewTweet.disabled = isLoading;
+    setNewEditButtonsState(!isLoading && newTweetResponse.value.trim() !== '');
+  }
+
+  function setNewEditButtonsState(enabled) {
+    newEditButtons.forEach(button => {
+      button.disabled = !enabled;
+      if (!enabled) {
+        button.setAttribute('title', 'Please generate a tweet first');
+      } else {
+        button.removeAttribute('title');
+      }
+    });
+    copyNewTweet.disabled = !enabled;
+  }
+
+  generateNewTweet.addEventListener('click', async () => {
+    setNewTweetLoading(true);
+    newTweetError.textContent = '';
+    newTweetResponse.value = '';
+
+    let content = linkInput.value.trim();
+    if (uploadedFile) {
+      const fileContent = await readFileContent(uploadedFile);
+      content += '\n\n' + fileContent;
+    }
+
+    const prompt = isSingleTweet
+      ? `Please write a single 280 character tweet based on the following information: ${content}`
+      : `Please create a thread from the following information. Do not make the thread longer than it needs to be, and use only 280 character tweets. Write the thread sequentially, but separate the threads by "%TWEET%". ${content}`;
+
+    try {
+      const response = await chrome.runtime.sendMessage({
+        action: "generateNewTweet",
+        prompt: prompt,
+        isSingleTweet: isSingleTweet
+      });
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      if (isSingleTweet) {
+        displayNewTweet(response.tweet);
+      } else {
+        displayThread(response.tweets);
+      }
+    } catch (error) {
+      newTweetError.textContent = `Error: ${error.message}`;
+    } finally {
+      setNewTweetLoading(false);
+    }
+  });
+
+  function displayNewTweet(tweet) {
+    newTweetResponse.value = tweet;
+    setNewEditButtonsState(true);
+  }
+
+  function displayThread(tweets) {
+    const threadContainer = document.createElement('div');
+    threadContainer.className = 'thread-container';
+
+    tweets.forEach((tweet, index) => {
+      const tweetBox = document.createElement('div');
+      tweetBox.className = 'tweet-box';
+
+      const tweetNumber = document.createElement('h3');
+      tweetNumber.textContent = `Tweet ${index + 1}`;
+      tweetBox.appendChild(tweetNumber);
+
+      const tweetText = document.createElement('textarea');
+      tweetText.value = tweet;
+      tweetText.readOnly = true;
+      tweetBox.appendChild(tweetText);
+
+      const copyButton = document.createElement('button');
+      copyButton.textContent = 'Copy to Clipboard';
+      copyButton.className = 'copy-button';
+      copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(tweet);
+        copyButton.textContent = 'Copied!';
+        setTimeout(() => {
+          copyButton.textContent = 'Copy to Clipboard';
+        }, 2000);
+      });
+      tweetBox.appendChild(copyButton);
+
+      threadContainer.appendChild(tweetBox);
+    });
+
+    newTweetResponse.replaceWith(threadContainer);
+    setNewEditButtonsState(true);
+  }
+
+  async function readFileContent(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => resolve(event.target.result);
+      reader.onerror = (error) => reject(error);
+      reader.readAsText(file);
+    });
+  }
+
+  copyNewTweet.addEventListener('click', () => {
+    navigator.clipboard.writeText(newTweetResponse.value);
+    copyNewTweet.textContent = 'Copied!';
+    setTimeout(() => {
+      copyNewTweet.textContent = 'Copy to Clipboard';
+    }, 2000);
+  });
+
+  // Initialize button states
+  updateGenerateButton();
+  setNewEditButtonsState(false);
 
   function switchTab(tabName) {
     if (tabName === 'reply') {
@@ -289,17 +449,18 @@ document.addEventListener('DOMContentLoaded', function() {
   // Ensure the Tweet Response tab is open by default
   switchTab('reply');
 
-  uploadButton.addEventListener('click', () => fileUpload.click());
+  console.log("Popup script initialized");
 
-  singleTweetButton.addEventListener('click', () => {
-    singleTweetButton.classList.add('active');
-    threadButton.classList.remove('active');
-  });
-
-  threadButton.addEventListener('click', () => {
-    threadButton.classList.add('active');
-    singleTweetButton.classList.remove('active');
-  });
-
-  // ... rest of your existing code ...
+  // Test function to manually update the textarea
+  window.testUpdate = function(text) {
+    console.log("Testing manual update of tweetResponse");
+    if (tweetResponse) {
+      tweetResponse.value = text;
+      console.log("tweetResponse value after manual update:", tweetResponse.value);
+      setLoading(false);
+      setEditButtonsState(true);
+    } else {
+      console.error("tweetResponse element not found in manual test");
+    }
+  };
 });
