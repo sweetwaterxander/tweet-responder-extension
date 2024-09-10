@@ -264,8 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const replyContent = document.getElementById('replyContent');
   const newTweetContentElement = document.getElementById('newTweetContent');
 
-  const fileUpload = document.getElementById('fileUpload');
-  const uploadButton = document.getElementById('uploadButton');
+  const pasteContentInput = document.getElementById('pasteContent');
   const linkInput = document.getElementById('linkInput');
   const singleTweetButton = document.getElementById('singleTweetButton');
   const threadButton = document.getElementById('threadButton');
@@ -284,7 +283,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('newMoreAgreeable')
   ];
 
-  let uploadedFile = null;
   let isSingleTweet = true;
 
   // Add these variables at the top of the file
@@ -298,24 +296,18 @@ document.addEventListener('DOMContentLoaded', function() {
       generateNewTweet.disabled = false;
       generateNewTweet.removeAttribute('title');
     } else {
-      const isDisabled = !(uploadedFile || linkInput.value.trim());
+      const isDisabled = !(pasteContentInput.value.trim() || linkInput.value.trim());
       generateNewTweet.disabled = isDisabled;
       if (isDisabled) {
-        generateNewTweet.setAttribute('title', 'Please upload a file or enter a link');
+        generateNewTweet.setAttribute('title', 'Please paste content or enter a link');
       } else {
         generateNewTweet.removeAttribute('title');
       }
     }
   }
 
-  fileUpload.addEventListener('change', (event) => {
-    uploadedFile = event.target.files[0];
-    updateGenerateButton();
-  });
-
+  pasteContentInput.addEventListener('input', updateGenerateButton);
   linkInput.addEventListener('input', updateGenerateButton);
-
-  uploadButton.addEventListener('click', () => fileUpload.click());
 
   singleTweetButton.addEventListener('click', () => {
     singleTweetButton.classList.add('active');
@@ -383,12 +375,11 @@ document.addEventListener('DOMContentLoaded', function() {
       let content = '';
       let linkUrl = '';
 
-      console.log('Uploaded file:', uploadedFile);
+      console.log('Pasted content:', pasteContentInput.value);
       console.log('Link input:', linkInput.value);
 
-      if (uploadedFile) {
-        content = await readFileContent(uploadedFile);
-        console.log('File content:', content.substring(0, 100) + '...');
+      if (pasteContentInput.value.trim()) {
+        content = pasteContentInput.value.trim();
       }
 
       if (linkInput.value.trim()) {
@@ -466,7 +457,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setNewEditButtonsState(false);
     generateNewTweet.textContent = 'Generate Tweet';
     chrome.storage.local.remove(['newTweetContent', 'newTweetIsSingleTweet', 'newTweetChatHistory']);
-    uploadedFile = null;
+    pasteContentInput.value = '';
     linkInput.value = '';
     isSingleTweet = true; // Reset to single tweet mode
     singleTweetButton.classList.add('active');

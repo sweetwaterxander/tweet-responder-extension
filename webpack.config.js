@@ -40,8 +40,6 @@ module.exports = {
         { from: "manifest.json", to: "manifest.json" },
         { from: "popup.html", to: "popup.html" },
         { from: "styles.css", to: "styles.css" },
-        { from: 'node_modules/pdfjs-dist/build/pdf.min.mjs', to: 'pdf.min.js' },
-        { from: 'node_modules/pdfjs-dist/build/pdf.worker.min.mjs', to: 'pdf.worker.min.js' },
       ],
     }),
   ]
