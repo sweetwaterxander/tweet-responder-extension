@@ -389,16 +389,28 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Link content:', linkContent.substring(0, 100) + '...');
       }
 
-      const prompt = isSingleTweet
+      const systemMessage = `You are a professional Tweeter. Please generate tweets based on the given information. Here are your STRICT guidelines:
+      1. Respond very concisely, less than 280 characters (per tweet), with no unnecessary fluff
+      2. Don't pander or be excessively ingratiating. NO EMOJIS, HASHTAGS, or exclamation points
+      3. Do NOT be unctuous
+      4. Tweet like a human who's tweeting. It doesn't need to be excessively formal. Be personable and informal. 
+      5. You can use a combination of first, second, or third person tense depending on what makes the most sense and the content provided`;
+
+      const userPrompt = isSingleTweet
         ? `Please write a single 280 character tweet based on the content from the following content. Make sure to exclude content that is not relevant to broader message/article included below: ${content}${linkUrl ? ` Source link: ${linkUrl}` : ''}`
         : `Please create a thread from following content. Make sure to exclude content that is not relevant to broader message/article included below. Do not make the thread longer than it needs to be, and use only 280 character tweets. Write the thread sequentially, but separate the threads by "%TWEET%". ${content}${linkUrl ? ` Source link: ${linkUrl}` : ''}`;
 
-      console.log('Final prompt:', prompt.substring(0, 100) + '...');
+      newTweetChatHistory = [
+        { role: "system", content: systemMessage },
+        { role: "user", content: userPrompt }
+      ];
+
+      console.log('Final prompt:', userPrompt.substring(0, 100) + '...');
 
       try {
         const response = await chrome.runtime.sendMessage({
           action: "generateNewTweet",
-          prompt: prompt,
+          chatHistory: newTweetChatHistory,
           isSingleTweet: isSingleTweet
         });
 
@@ -411,18 +423,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isSingleTweet) {
           displayNewTweet(response.tweet);
           newTweetContent = response.tweet;
+          newTweetChatHistory.push({ role: "assistant", content: response.tweet });
         } else {
           displayThread(response.tweets);
           newTweetContent = response.tweets;
+          newTweetChatHistory.push({ role: "assistant", content: response.tweets.join('%TWEET%') });
         }
         newTweetIsSingleTweet = isSingleTweet;
-
-        // Update newTweetChatHistory
-        newTweetChatHistory = [
-          { role: "system", content: "You are a professional Tweeter. Please generate tweets based on the given information." },
-          { role: "user", content: prompt },
-          { role: "assistant", content: isSingleTweet ? response.tweet : response.tweets.join('%TWEET%') }
-        ];
 
         // Save the generated content and chat history to local storage
         chrome.storage.local.set({ 

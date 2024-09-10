@@ -24,13 +24,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({success: true});
     return true;
   } else if (request.action === "generateNewTweet") {
-    console.log("Generating new tweet:", request.prompt);
-    generateNewTweet(request.prompt, request.isSingleTweet).then(sendResponse);
-    return true; // Indicates that the response is asynchronous
-  } else if (request.action === "extractLinkContent") {
-    fetchUrl(request.url)
-      .then(content => sendResponse({ content }))
-      .catch(error => sendResponse({ error: error.message }));
+    console.log("Generating new tweet:", request.chatHistory);
+    generateNewTweet(request.chatHistory, request.isSingleTweet).then(sendResponse);
     return true; // Indicates that the response is asynchronous
   } else if (request.action === "editNewTweet") {
     console.log("Editing new tweet with chat history:", request.chatHistory);
@@ -112,21 +107,9 @@ async function editTweet(instruction) {
   }
 }
 
-async function generateNewTweet(prompt, isSingleTweet) {
-  const systemMessage = `You are a professional Tweeter. Please generate tweets based on the given information. Here are your STRICT guidelines:
-  1. Respond very concisely, less than 280 characters (per tweet), with no unnecessary fluff
-  2. I will tell you whether you are generating a single tweet or a thread. A thread is a series of tweets that are separated by "%TWEET%".
-  3. Don't pander or be excessively ingratiating. NO EMOJIS, HASHTAGS, or exclamation points
-  4. Do NOT be unctuous
-  5. Tweet like a human who's tweeting. It doesn't need to be excessively formal. Be personable and informal. 
-  8. You can use a combination of first, second, or third person tense depending on what makes the most sense and the content provided`;
-  const messages = [
-    { role: "system", content: systemMessage },
-    { role: "user", content: prompt }
-  ];
-
+async function generateNewTweet(chatHistory, isSingleTweet) {
   try {
-    const response = await callOpenAI(messages);
+    const response = await callOpenAI(chatHistory);
     console.log("Received response from OpenAI:", response);
 
     if (isSingleTweet) {
@@ -178,23 +161,6 @@ async function callOpenAI(messages) {
   } catch (error) {
     console.error('Error in callOpenAI:', error);
     throw error;
-  }
-}
-
-function extractTextContent(doc) {
-  return doc.body.innerText;
-}
-
-async function fetchUrl(url) {
-  try {
-    const response = await fetch(url);
-    const html = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    return doc.body.innerText;
-  } catch (error) {
-    console.error('Error fetching URL:', error);
-    throw new Error('Failed to fetch');
   }
 }
 
