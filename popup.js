@@ -57,6 +57,11 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("Setting loading state:", isLoading);
     loadingOverlay.style.display = isLoading ? 'flex' : 'none';
     generateButton.disabled = isLoading;
+    if (isLoading) {
+      generateButton.removeAttribute('title');
+    } else {
+      setButtonState(false);
+    }
     setEditButtonsState(!isLoading && tweetResponse.value.trim() !== '');
   }
 
@@ -257,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const replyTab = document.getElementById('replyTab');
   const newTweetTab = document.getElementById('newTweetTab');
   const replyContent = document.getElementById('replyContent');
-  const newTweetContent = document.getElementById('newTweetContent');
+  const newTweetContentElement = document.getElementById('newTweetContent');
 
   const fileUpload = document.getElementById('fileUpload');
   const uploadButton = document.getElementById('uploadButton');
@@ -282,8 +287,25 @@ document.addEventListener('DOMContentLoaded', function() {
   let uploadedFile = null;
   let isSingleTweet = true;
 
+  // Add these variables at the top of the file
+  let newTweetContent = null;
+  let newTweetIsSingleTweet = true;
+  let newTweetChatHistory = [];
+  let threadContainer = null;
+
   function updateGenerateButton() {
-    generateNewTweet.disabled = !(uploadedFile || linkInput.value.trim());
+    if (generateNewTweet.textContent === 'Reset') {
+      generateNewTweet.disabled = false;
+      generateNewTweet.removeAttribute('title');
+    } else {
+      const isDisabled = !(uploadedFile || linkInput.value.trim());
+      generateNewTweet.disabled = isDisabled;
+      if (isDisabled) {
+        generateNewTweet.setAttribute('title', 'Please upload a file or enter a link');
+      } else {
+        generateNewTweet.removeAttribute('title');
+      }
+    }
   }
 
   fileUpload.addEventListener('change', (event) => {
@@ -310,6 +332,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function setNewTweetLoading(isLoading) {
     newTweetLoadingOverlay.style.display = isLoading ? 'flex' : 'none';
     generateNewTweet.disabled = isLoading;
+    if (isLoading) {
+      generateNewTweet.removeAttribute('title');
+    } else {
+      updateGenerateButton();
+    }
     setNewEditButtonsState(!isLoading && newTweetResponse.value.trim() !== '');
   }
 
@@ -323,6 +350,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     copyNewTweet.disabled = !enabled;
+    if (!enabled) {
+      copyNewTweet.setAttribute('title', 'Please generate a tweet first');
+    } else {
+      copyNewTweet.removeAttribute('title');
+    }
   }
 
   async function extractLinkContent(url) {
@@ -341,66 +373,169 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   generateNewTweet.addEventListener('click', async () => {
-    setNewTweetLoading(true);
-    newTweetError.textContent = '';
-    newTweetResponse.value = '';
+    if (generateNewTweet.textContent === 'Reset') {
+      resetNewTweetState();
+    } else {
+      setNewTweetLoading(true);
+      newTweetError.textContent = '';
+      newTweetResponse.value = '';
 
-    let content = '';
+      let content = '';
+      let linkUrl = '';
 
-    console.log('Uploaded file:', uploadedFile);
-    console.log('Link input:', linkInput.value);
+      console.log('Uploaded file:', uploadedFile);
+      console.log('Link input:', linkInput.value);
 
-    if (uploadedFile) {
-      content = await readFileContent(uploadedFile);
-      console.log('File content:', content.substring(0, 100) + '...');
-    }
-
-    if (linkInput.value.trim()) {
-      const linkContent = await extractLinkContent(linkInput.value.trim());
-      content += '\n\n' + linkContent;
-      console.log('Link content:', linkContent.substring(0, 100) + '...');
-    }
-
-    const prompt = isSingleTweet
-      ? `Please write a single 280 character tweet based on the content from the following website extraction. Make sure to exclude content that is not relevant to broader message/article included below: ${content}`
-      : `Please create a thread from following website extraction. Make sure to exclude content that is not relevant to broader message/article included below. Do not make the thread longer than it needs to be, and use only 280 character tweets. Write the thread sequentially, but separate the threads by "%TWEET%". ${content}`;
-
-    console.log('Final prompt:', prompt.substring(0, 100) + '...');
-
-    try {
-      const response = await chrome.runtime.sendMessage({
-        action: "generateNewTweet",
-        prompt: prompt,
-        isSingleTweet: isSingleTweet
-      });
-
-      console.log('Response from background script:', response);
-
-      if (response.error) {
-        throw new Error(response.error);
+      if (uploadedFile) {
+        content = await readFileContent(uploadedFile);
+        console.log('File content:', content.substring(0, 100) + '...');
       }
 
-      if (isSingleTweet) {
-        displayNewTweet(response.tweet);
-      } else {
-        displayThread(response.tweets);
+      if (linkInput.value.trim()) {
+        linkUrl = linkInput.value.trim();
+        const linkContent = await extractLinkContent(linkUrl);
+        content += '\n\n' + linkContent;
+        console.log('Link content:', linkContent.substring(0, 100) + '...');
       }
-    } catch (error) {
-      console.error('Error generating tweet:', error);
-      newTweetError.textContent = `Error: ${error.message}`;
-    } finally {
-      setNewTweetLoading(false);
+
+      const prompt = isSingleTweet
+        ? `Please write a single 280 character tweet based on the content from the following content. Make sure to exclude content that is not relevant to broader message/article included below: ${content}${linkUrl ? ` Source link: ${linkUrl}` : ''}`
+        : `Please create a thread from following content. Make sure to exclude content that is not relevant to broader message/article included below. Do not make the thread longer than it needs to be, and use only 280 character tweets. Write the thread sequentially, but separate the threads by "%TWEET%". ${content}${linkUrl ? ` Source link: ${linkUrl}` : ''}`;
+
+      console.log('Final prompt:', prompt.substring(0, 100) + '...');
+
+      try {
+        const response = await chrome.runtime.sendMessage({
+          action: "generateNewTweet",
+          prompt: prompt,
+          isSingleTweet: isSingleTweet
+        });
+
+        console.log('Response from background script:', response);
+
+        if (response.error) {
+          throw new Error(response.error);
+        }
+
+        if (isSingleTweet) {
+          displayNewTweet(response.tweet);
+          newTweetContent = response.tweet;
+        } else {
+          displayThread(response.tweets);
+          newTweetContent = response.tweets;
+        }
+        newTweetIsSingleTweet = isSingleTweet;
+
+        // Update newTweetChatHistory
+        newTweetChatHistory = [
+          { role: "system", content: "You are a professional Tweeter. Please generate tweets based on the given information." },
+          { role: "user", content: prompt },
+          { role: "assistant", content: isSingleTweet ? response.tweet : response.tweets.join('%TWEET%') }
+        ];
+
+        // Save the generated content and chat history to local storage
+        chrome.storage.local.set({ 
+          newTweetContent: newTweetContent,
+          newTweetIsSingleTweet: newTweetIsSingleTweet,
+          newTweetChatHistory: newTweetChatHistory
+        });
+
+        // Change button text to "Reset"
+        generateNewTweet.textContent = 'Reset';
+
+        // Enable edit buttons immediately after generating content
+        setNewEditButtonsState(true);
+      } catch (error) {
+        console.error('Error generating tweet:', error);
+        newTweetError.textContent = `Error: ${error.message}`;
+      } finally {
+        setNewTweetLoading(false);
+        updateGenerateButton();
+      }
     }
   });
 
+  function resetNewTweetState() {
+    newTweetResponse.value = '';
+    newTweetResponse.style.display = 'block';
+    if (threadContainer) {
+      threadContainer.innerHTML = '';
+      threadContainer.style.display = 'none';
+    }
+    newTweetError.textContent = '';
+    setNewEditButtonsState(false);
+    generateNewTweet.textContent = 'Generate Tweet';
+    chrome.storage.local.remove(['newTweetContent', 'newTweetIsSingleTweet', 'newTweetChatHistory']);
+    uploadedFile = null;
+    linkInput.value = '';
+    isSingleTweet = true; // Reset to single tweet mode
+    singleTweetButton.classList.add('active');
+    threadButton.classList.remove('active');
+    updateGenerateButton();
+    newTweetChatHistory = [];
+
+    // Show the main Copy to Clipboard button
+    copyNewTweet.style.display = 'block';
+  }
+
+  function loadSavedNewTweetContent() {
+    chrome.storage.local.get(['newTweetContent', 'newTweetIsSingleTweet', 'newTweetChatHistory'], function(result) {
+      if (result.newTweetContent) {
+        newTweetContent = result.newTweetContent;
+        newTweetIsSingleTweet = result.newTweetIsSingleTweet;
+        newTweetChatHistory = result.newTweetChatHistory || [];
+        if (newTweetIsSingleTweet) {
+          displayNewTweet(newTweetContent);
+          isSingleTweet = true;
+          singleTweetButton.classList.add('active');
+          threadButton.classList.remove('active');
+        } else {
+          displayThread(newTweetContent);
+          isSingleTweet = false;
+          threadButton.classList.add('active');
+          singleTweetButton.classList.remove('active');
+        }
+        generateNewTweet.textContent = 'Reset';
+        generateNewTweet.disabled = false;
+        setNewEditButtonsState(true);
+      } else {
+        generateNewTweet.textContent = 'Generate Tweet';
+        generateNewTweet.disabled = false;
+        updateGenerateButton();
+
+        // Show the main Copy to Clipboard button when there's no saved content
+        copyNewTweet.style.display = 'block';
+      }
+    });
+  }
+
   function displayNewTweet(tweet) {
     newTweetResponse.value = tweet;
+    newTweetResponse.style.display = 'block';
+    if (threadContainer) {
+      threadContainer.innerHTML = '';
+      threadContainer.style.display = 'none';
+    }
     setNewEditButtonsState(true);
+
+    // Show the main Copy to Clipboard button for single tweets
+    copyNewTweet.style.display = 'block';
   }
 
   function displayThread(tweets) {
-    const threadContainer = document.createElement('div');
-    threadContainer.className = 'thread-container';
+    if (!threadContainer) {
+      threadContainer = document.createElement('div');
+      threadContainer.id = 'threadContainer';
+      threadContainer.className = 'thread-container';
+      newTweetResponse.parentNode.insertBefore(threadContainer, newTweetResponse.nextSibling);
+    }
+
+    // Clear the thread container
+    threadContainer.innerHTML = '';
+
+    // Hide the single tweet textarea and show the thread container
+    newTweetResponse.style.display = 'none';
+    threadContainer.style.display = 'block';
 
     tweets.forEach((tweet, index) => {
       const tweetBox = document.createElement('div');
@@ -430,50 +565,71 @@ document.addEventListener('DOMContentLoaded', function() {
       threadContainer.appendChild(tweetBox);
     });
 
-    newTweetResponse.replaceWith(threadContainer);
+    // Enable edit buttons
     setNewEditButtonsState(true);
+
+    // Hide the main Copy to Clipboard button
+    copyNewTweet.style.display = 'none';
+
+    // Ensure the generate button says "Reset"
+    generateNewTweet.textContent = 'Reset';
+
+    // Update the button states
+    updateGenerateButton();
+
+    // Force a re-render of the buttons
+    setTimeout(() => {
+      newEditButtons.forEach(button => {
+        button.disabled = false;
+        button.removeAttribute('title');
+      });
+    }, 0);
   }
 
-  async function readFileContent(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        let content = '';
-        if (file.type === 'application/pdf') {
-          try {
-            const typedArray = new Uint8Array(event.target.result);
-            const pdf = await pdfjsLib.getDocument({data: typedArray}).promise;
-            for (let i = 1; i <= pdf.numPages; i++) {
-              const page = await pdf.getPage(i);
-              const textContent = await page.getTextContent();
-              content += textContent.items.map(item => item.str).join(' ') + '\n';
-            }
-          } catch (error) {
-            console.error('Error processing PDF:', error);
-            content = `Unable to extract text from PDF: ${error.message}`;
-          }
-        } else if (file.type.includes('word')) {
-          try {
-            const arrayBuffer = event.target.result;
-            const result = await mammoth.extractRawText({arrayBuffer});
-            content = result.value;
-          } catch (error) {
-            console.error('Error processing Word document:', error);
-            content = `Unable to extract text from Word document: ${error.message}`;
-          }
-        } else if (file.type.startsWith('text/')) {
-          content = event.target.result;
-        } else {
-          content = `Unable to extract text from file type: ${file.type}`;
-        }
-        resolve(content);
-      };
-      reader.onerror = (error) => reject(error);
-      
-      if (file.type === 'application/pdf' || file.type.includes('word')) {
-        reader.readAsArrayBuffer(file);
+  // Add event listeners for edit buttons
+  newEditButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const instruction = button.textContent.toLowerCase();
+      editNewTweet(instruction);
+    });
+  });
+
+  // Add this function to edit new tweets
+  function editNewTweet(instruction) {
+    setNewTweetLoading(true);
+    
+    // Add the instruction to the chat history
+    newTweetChatHistory.push({ role: "user", content: instruction });
+
+    chrome.runtime.sendMessage({
+      action: "editNewTweet",
+      chatHistory: newTweetChatHistory,
+      isSingleTweet: newTweetIsSingleTweet
+    }, response => {
+      if (chrome.runtime.lastError) {
+        console.error("Error sending message:", chrome.runtime.lastError);
+        setNewTweetLoading(false);
+        newTweetError.textContent = "Error: " + chrome.runtime.lastError.message;
+      } else if (response.error) {
+        console.error("Error editing tweet:", response.error);
+        setNewTweetLoading(false);
+        newTweetError.textContent = "Error: " + response.error;
       } else {
-        reader.readAsText(file);
+        if (newTweetIsSingleTweet) {
+          displayNewTweet(response.tweet);
+          newTweetContent = response.tweet;
+          newTweetChatHistory.push({ role: "assistant", content: response.tweet });
+        } else {
+          displayThread(response.tweets);
+          newTweetContent = response.tweets;
+          newTweetChatHistory.push({ role: "assistant", content: response.tweets.join('%TWEET%') });
+        }
+        chrome.storage.local.set({ 
+          newTweetContent: newTweetContent,
+          newTweetIsSingleTweet: newTweetIsSingleTweet,
+          newTweetChatHistory: newTweetChatHistory
+        });
+        setNewTweetLoading(false);
       }
     });
   }
@@ -496,15 +652,16 @@ document.addEventListener('DOMContentLoaded', function() {
       newTweetTab.classList.remove('active');
       replyContent.classList.add('active');
       replyContent.style.display = 'flex';
-      newTweetContent.classList.remove('active');
-      newTweetContent.style.display = 'none';
+      newTweetContentElement.classList.remove('active');
+      newTweetContentElement.style.display = 'none';
     } else if (tabName === 'new') {
       newTweetTab.classList.add('active');
       replyTab.classList.remove('active');
-      newTweetContent.classList.add('active');
-      newTweetContent.style.display = 'flex';
+      newTweetContentElement.classList.add('active');
+      newTweetContentElement.style.display = 'flex';
       replyContent.classList.remove('active');
       replyContent.style.display = 'none';
+      updateGenerateButton(); // Add this line to update the button state when switching to the New Tweet tab
     }
   }
 
@@ -528,4 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error("tweetResponse element not found in manual test");
     }
   };
+
+  // Call loadSavedNewTweetContent when the popup is opened
+  loadSavedNewTweetContent();
 });

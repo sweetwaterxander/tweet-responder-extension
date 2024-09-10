@@ -182,6 +182,7 @@ textarea {
 
 button[disabled] {
   position: relative;
+  cursor: not-allowed;
 }
 
 button[disabled]:hover::before {
@@ -203,6 +204,10 @@ button[disabled]:hover::before {
   margin-bottom: 5px;
   max-width: 200px; /* Adjust this value as needed */
   width: max-content;
+}
+
+button[disabled]:not([title]):hover::before {
+  display: none;
 }
 
 button[disabled]:hover::before {
@@ -314,7 +319,6 @@ button[disabled]::before {
 }
 
 #linkInput {
-  width: 100%;
   padding: 8px;
   background-color: #374151;
   color: white;

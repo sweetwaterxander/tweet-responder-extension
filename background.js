@@ -32,6 +32,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .then(content => sendResponse({ content }))
       .catch(error => sendResponse({ error: error.message }));
     return true; // Indicates that the response is asynchronous
+  } else if (request.action === "editNewTweet") {
+    console.log("Editing new tweet with chat history:", request.chatHistory);
+    editNewTweet(request.chatHistory, request.isSingleTweet).then(sendResponse);
+    return true; // Indicates that the response is asynchronous
   }
 });
 
@@ -109,8 +113,15 @@ async function editTweet(instruction) {
 }
 
 async function generateNewTweet(prompt, isSingleTweet) {
+  const systemMessage = `You are a professional Tweeter. Please generate tweets based on the given information. Here are your STRICT guidelines:
+  1. Respond very concisely, less than 280 characters (per tweet), with no unnecessary fluff
+  2. I will tell you whether you are generating a single tweet or a thread. A thread is a series of tweets that are separated by "%TWEET%".
+  3. Don't pander or be excessively ingratiating. NO EMOJIS, HASHTAGS, or exclamation points
+  4. Do NOT be unctuous
+  5. Tweet like a human who's tweeting. It doesn't need to be excessively formal. Be personable and informal. 
+  8. You can use a combination of first, second, or third person tense depending on what makes the most sense and the content provided`;
   const messages = [
-    { role: "system", content: "You are a professional Tweeter. Please generate tweets based on the given information." },
+    { role: "system", content: systemMessage },
     { role: "user", content: prompt }
   ];
 
@@ -184,5 +195,22 @@ async function fetchUrl(url) {
   } catch (error) {
     console.error('Error fetching URL:', error);
     throw new Error('Failed to fetch');
+  }
+}
+
+async function editNewTweet(chatHistory, isSingleTweet) {
+  try {
+    const response = await callOpenAI(chatHistory);
+    console.log("Received edited response from OpenAI:", response);
+    
+    if (isSingleTweet) {
+      return { tweet: response.trim() };
+    } else {
+      const tweets = response.split('%TWEET%').map(tweet => tweet.trim()).filter(tweet => tweet);
+      return { tweets: tweets };
+    }
+  } catch (error) {
+    console.error('Error in editNewTweet:', error);
+    return { error: "Failed to edit tweet: " + error.message };
   }
 }
