@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Naval Tweet Responder",
+  "name": "Twitter Audience Builder",
   "version": "1.0",
-  "description": "Generate responses to tweets in the style of Naval Ravikant",
+  "description": "Generate responses to tweets and new tweets and threads",
   "permissions": ["activeTab", "storage"],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": ["<all_urls>","https://x-generator-7e248hzho-sweetwaterxanders-projects.vercel.app"],
   "action": {
     "default_popup": "popup.html"
   },
@@ -23,6 +23,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://extensionpay.com https://api.openai.com https://* http://*"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://extensionpay.com https://your-actual-vercel-url.vercel.app https://* http://*"
   }
 }

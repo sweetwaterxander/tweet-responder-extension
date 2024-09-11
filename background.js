@@ -112,7 +112,7 @@ Below are some examples of great Tweet replies. Train off of these examples and 
 
 18. The most important role in a successful persons life is not their spouse or mentor It's the friend who makes fun of them in the group chat Shoutout to the ball busters
 
-19. Great post. Might have the same impact makers v managers schedule One question. It looks like Elon: - read this - might be the best example of founder mode but you didn't use his example. Curious why?
+19. Great post. Might have the same impact mrr v managers schedule One question. It looks like Elon: - read this - might be the best example of founder mode but you didn't use his example. Curious why?
 
 20. Good friends consume together, Great friends create together
 
@@ -244,12 +244,9 @@ async function generateNewTweet(chatHistory, isSingleTweet) {
 async function callOpenAI(messages) {
   console.log("Calling OpenAI with messages:", messages);
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://your-actual-vercel-url.vercel.app/api/generate', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,

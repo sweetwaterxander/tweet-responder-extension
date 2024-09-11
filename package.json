@@ -18,6 +18,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "extpay": "^3.0.7"
+    "extpay": "^3.0.7",
+    "vercel": "^37.4.2"
   }
 }
