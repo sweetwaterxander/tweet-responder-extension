@@ -8,6 +8,7 @@
   padding: 20px;
   box-sizing: border-box;
   text-align: center;
+  background-color: #111827;
 }
 
 .auth-title {
@@ -79,6 +80,8 @@ body {
   align-items: center;
   padding: 8px 16px;
   background-color: #111827; /* Matching card background */
+  margin-top: -11px;
+  margin-bottom: -5px;
 }
 
 .card-title {
@@ -142,7 +145,7 @@ button:disabled {
 }
 
 textarea {
-  height: 96px;
+  height: 96px !important;
   resize: none;
   background-color: #262d38; /* Darker background for textarea */
   color: white;
