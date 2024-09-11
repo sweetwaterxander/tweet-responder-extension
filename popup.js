@@ -272,27 +272,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
   makeConciseButton.addEventListener('click', () => {
     console.log("Make concise button clicked");
-    editTweet("Make the previous response more concise");
+    editTweet("Make the previous response more concise and remove any unnecessary fluff and make it sound more human and natural");
   });
   moreConservativeButton.addEventListener('click', () => {
     console.log("More conservative button clicked");
-    editTweet("Make the previous response more politically conservative");
+    editTweet("Make the previous response much more politically conservative and right-leaning");
   });
   moreLiberalButton.addEventListener('click', () => {
     console.log("More liberal button clicked");
-    editTweet("Make the previous response more politically liberal");
+    editTweet("Make the previous response much more politically liberal and left-leaning");
   });
   moreUniqueButton.addEventListener('click', () => {
     console.log("More unique button clicked");
-    editTweet("Re-do your response and make it more unique");
+    editTweet("Re-do your response and make it more unique and interesting");
   });
   moreContrarianButton.addEventListener('click', () => {
     console.log("More contrarian button clicked");
-    editTweet("Re-make your response with a more contrarian perspective");
+    editTweet("Re-make your response with a more contrarian perspective. Take an opposing view to the tweet. It can even be inflamatory.");
   });
   moreAgreeableButton.addEventListener('click', () => {
     console.log("More agreeable button clicked");
-    editTweet("Re-make your response and make it more agreeable and complementary to the tweet");
+    editTweet("Re-make your response and make it more agreeable and complementary to the tweet. The person tweeting made a good point.");
   });
 
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -464,14 +464,67 @@ document.addEventListener('DOMContentLoaded', function() {
         content += '\n\n' + linkContent;
         console.log('Link content:', linkContent.substring(0, 100) + '...');
       }
-
       const systemMessage = `You are a professional Tweeter. Please generate tweets based on the given information. Here are your STRICT guidelines:
       1. Respond very concisely, less than 280 characters (per tweet), with no unnecessary fluff
       2. Don't pander or be excessively ingratiating. ABSOLUTELY NO EMOJIS, HASHTAGS, or exclamation points
       3. Do NOT be unctuous but be interesting, unique, and DON'T be boring or dry.
-      4. Tweet like a human who's tweeting. It doesn't need to be excessively formal. Be personable and informal. 
+      4. Tweet like a human who's tweeting. It doesn't need to be excessively formal. Be personable and informal.
       5. You can use a combination of second or third person tense depending on what makes the most sense and the content provided. But if the content is business or news related, use the third person tense.
-      6. DO NOT use the first person tense when reporting on news or business. You may only use the first person tense when writing a personal thought about the content in a unique or interesting way/perspective.`;
+      6. DO NOT use the first person tense when reporting on news or business. You may only use the first person tense when writing a personal thought about the content in a unique or interesting way/perspective.
+
+      Below are some examples of great Tweets and Threads. Train off of these examples and respond in a style conducive to the quality and feel of the Tweets below:
+      1. 
+      Tried my hand at startup advisory work earlier this yr (early-stage) Didn't like it Advice mostly boiled down to same 5 things 1. Narrow focus & increase quality 2. Optimize for speed 3. Don't hire until it hurts 4. Talk to customers a lot 5. If unsure abt teammate, move on
+      2. (THREAD)
+      %TWEET%
+      Making a product worse can actually make it better. Here's my #1 unconventional tip on becoming a better designer: Make 'cursed product designs' Here's why...
+      %TWEET%
+      -> iOS Clock app charging you money for pressing snooze. -> The weather app that lets you bet against the forecast -> Apple Watch Workout app recording "existential crisis"
+      %TWEET%
+      What most don't realize is that they're actually a great product design exercise. To create 'cursed product designs,' you have to deeply think "How can I make this product comically worse?" Why does this matter?
+      %TWEET%
+      When you train yourself to think about how a product can get worse, you're also training yourself to think about how it can be better. This process helps you understand the subtleties of the product's core value. Let's use Instagram as an example.
+      %TWEET%
+      There are tons of influencers on the platform who flex their expensive vacations in Greece, the Maldives, or other exotic places. But there are cases where the picture is taken nowhere near where they claim it to be.
+      %TWEET%
+      For instance, there was one influencer who faked a vacation of herself in Bali, but the photo was actually taken in IKEA. She did this on purpose to make fun of Instagram influencers faking their vacation. Now let's think: what would be the 'cursed product design' here?
+      %TWEET%
+      Imagine if whenever an influencer wanted to tag themselves in a place they're not, Instagram showed a warning and charged them $29.99 to post. This is undoubtedly a hilariously worse product experience. However, it helps us understand what's good about the platform.
+      %TWEET%
+      We dislike fake pictures on Instagram because we want to connect with others as humans, not with the fake persona they project. Once we get that, we can start thinking about how to make it better: How can we make Instagram more about authentically connecting with someone?
+      %TWEET%
+      From there, we can start designing a feature around this core idea. I'd highly recommend trying the 'cursed product design' exercise.
+      3.
+      Singlehandedly the most important thing @rabois taught me was how to build startups the way Hollywood makes films You write a script (vision), you cast the ideal leads (cofounders) and then you go build it You don't A/B test your way to a generational co
+      4. (THREAD)
+      %TWEET%
+      He sold over 20,000,000 pairs of sunglasses with a 240 word story. And is considered to be one of the greatest copywriters, ever. Here're 5 of Joe Sugarman's most powerful writing secrets: (Starting with the two he called "THE most powerful")
+      %TWEET%
+      Seeds Of Curiosity It's the key to keeping attention. And the reason you're reading this thread. 5 simple tips to infuse your copy with max curiosity: • Tell stories • Tease a benefit • Offer explanations • Withhold information • Ask & answer questions The second tool?
+      %TWEET%
+      The Slippery Slide If there's a rule that'll change your writing forever it's this: "The role of the first sentence is to get your reader to read the next" To nail your 1st sentence make it: • Intriguing • Easy to read • Short & snappy Make your reader slide down the page
+      %TWEET%
+      People Buy With Emotion, Then Justify With Logic Lamborghini sells status, not cars. When writing, open with emotion. Then back it up with logic. An easy way to do it? Talk about benefits before features.
+      %TWEET%
+      Edit Like A Pro The aim is to "express exactly what you want with the fewest words." 5 tips to edit like a pro: • Remove "that" • Eliminate fillers • Reword for rhythm • Combine sentences • Rearrange for flow (emotion, then logic) Writing well is 80% editing.
+      %TWEET%
+      Sell The Sizzle, Not The Steak Selling with words alone is hard. Because online, trust is low and skepticism is high. So here's something you can try: Sell the concept, not your product. Like Apple sells simplicity, not electronics.
+      5.
+      America needs mass deportations. No more armed Venezuelan gangs taking over communities. No more Chilean gangs robbing our homes. No more Laken Rileys or Rachel Morins murdered and raped. No more 100,000 fentanyl deaths a year. No more free flights into America with free hotels and free cash. No more!! Send them back!!
+      6.
+      The solution against evil is for the good guys to fight and win. Those who forget there can be evil in the world, also tend to forget about the divine.
+      7.
+      Imagine: "The year is 1994 and Vint Cerf and Rob Kahn have just been arrested Their invention (TCP/IP) is being used for drug dealers to communicate with each other and they were unwilling to install a back door" The equivalent version of this just happened with Telegram
+      8.
+      Soviets and Maoists also used this branding with revolutionaries, before their bad ideas eventually each led to unchecked government and the deaths of tens of millions. One wonders if some of them are "trained Marxists" doing it on purpose, or if populist history just repeats.
+      9.
+      1990: zero states with obesity rates above 20% 2018: zero states with obesity rates below 20% Not to mention an explosion in chronic disease, cancer, ADHD, inflammation... Something has to change. And that something is our broken food system.
+      10.
+      These stats are absolutely insane: - 74% of adults are overweight - 50% of children are overweight - 50% of adults have diabetes or pre diabetes - 30% of teens have diabetes and pre diabetes - 40% of 18 and under have a mental health diagnosis - young adult cancers are up 70% - 1 in 36 kids have autism It is criminal what is being done to our health. We are being poisoned
+      11.
+      The Chevron decision feels like one of those unsexy things that could have a hugely positive impact on American competitiveness and innovation over the next decade
+      12.
+      Every player in the healthcare system makes more money when people are sick. Every player in the food system makes more money when people eat hyper-processed foods. Yet we're confused by record levels of obesity, record levels of chronic disease, and record healthcare cost?`;
 
       const userPrompt = isSingleTweet
         ? `Please write a single 280 character tweet based on the content from the following content. Make sure to exclude content that is not relevant to broader message/article included below: ${content}${linkUrl ? ` Source link: ${linkUrl}` : ''}`
