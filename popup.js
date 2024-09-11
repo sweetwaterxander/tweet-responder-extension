@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   moreContrarianButton.addEventListener('click', () => {
     console.log("More contrarian button clicked");
-    editTweet("Re-make your response with a more contrarian perspective. Take an opposing view to the tweet. It can even be inflamatory.");
+    editTweet("Re-make your response with a more contrarian perspective. Take an opposing view to the tweet. It can even be inflammatory.");
   });
   moreAgreeableButton.addEventListener('click', () => {
     console.log("More agreeable button clicked");
@@ -726,8 +726,32 @@ document.addEventListener('DOMContentLoaded', function() {
   function editNewTweet(instruction) {
     setNewTweetLoading(true);
     
-    // Add the instruction to the chat history
-    newTweetChatHistory.push({ role: "user", content: instruction });
+    // Add the full instruction to the chat history, not just the button text
+    let fullInstruction = "";
+    switch(instruction.toLowerCase()) {
+      case "make more concise":
+        fullInstruction = "Make the previous response more concise and remove any unnecessary fluff and make it sound more human and natural";
+        break;
+      case "more conservative":
+        fullInstruction = "Make the previous response much more politically conservative and right-leaning";
+        break;
+      case "more liberal":
+        fullInstruction = "Make the previous response much more politically liberal and left-leaning";
+        break;
+      case "more unique":
+        fullInstruction = "Re-do your response and make it more unique and interesting";
+        break;
+      case "more contrarian":
+        fullInstruction = "Re-make your response with a more contrarian perspective. Take an opposing view to the tweet. It can even be inflammatory.";
+        break;
+      case "more agreeable":
+        fullInstruction = "Re-make your response and make it more agreeable and complementary to the tweet. The person tweeting made a good point.";
+        break;
+      default:
+        fullInstruction = instruction;
+    }
+    
+    newTweetChatHistory.push({ role: "user", content: fullInstruction });
 
     chrome.runtime.sendMessage({
       action: "editNewTweet",
