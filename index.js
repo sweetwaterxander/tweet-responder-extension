@@ -15,9 +15,12 @@ app.post('/api/generate', async (req, res) => {
     });
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error calling OpenAI:', error.response ? error.response.data : error.message);
+    res.status(500).json({ error: 'An error occurred while processing your request' });
   }
 });
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
+
+module.exports = app;
