@@ -4,7 +4,10 @@
   "version": "1.0",
   "description": "Generate responses to tweets and new tweets and threads",
   "permissions": ["activeTab", "storage"],
-  "host_permissions": ["<all_urls>","https://x-generator-7e248hzho-sweetwaterxanders-projects.vercel.app"],
+  "host_permissions": [
+    "<all_urls>",
+    "https://x-generator-oktoaf1yz-sweetwaterxanders-projects.vercel.app"
+  ],
   "action": {
     "default_popup": "popup.html"
   },
@@ -23,6 +26,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://extensionpay.com https://your-actual-vercel-url.vercel.app https://* http://*"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://extensionpay.com https://x-generator-oktoaf1yz-sweetwaterxanders-projects.vercel.app https://* http://*"
   }
 }
