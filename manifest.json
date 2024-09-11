@@ -6,7 +6,7 @@
   "permissions": ["activeTab", "storage"],
   "host_permissions": [
     "<all_urls>",
-    "https://x-generator-oktoaf1yz-sweetwaterxanders-projects.vercel.app"
+    "https://x-generator.vercel.app"
   ],
   "action": {
     "default_popup": "popup.html"
@@ -26,6 +26,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://extensionpay.com https://x-generator-oktoaf1yz-sweetwaterxanders-projects.vercel.app https://* http://*"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://extensionpay.com https://x-generator.vercel.app https://* http://*"
   }
 }

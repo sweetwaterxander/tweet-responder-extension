@@ -244,7 +244,7 @@ async function generateNewTweet(chatHistory, isSingleTweet) {
 async function callOpenAI(messages) {
   console.log("Calling OpenAI with messages:", messages);
   try {
-    const response = await fetch('https://x-generator-oktoaf1yz-sweetwaterxanders-projects.vercel.app/api/generate', {
+    const response = await fetch('https://x-generator.vercel.app/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
