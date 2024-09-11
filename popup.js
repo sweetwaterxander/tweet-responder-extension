@@ -2,7 +2,78 @@ console.log('Popup script loaded');
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM content loaded');
-  
+
+  // ExtPay initialization
+  const extpay = ExtPay('x-generator'); // Replace with your actual extension ID
+  const authScreen = document.getElementById('auth-screen');
+  const content = document.getElementById('content');
+  const loginButton = document.getElementById('loginButton');
+  const signupButton = document.getElementById('signupButton');
+  const settingsButtons = document.querySelectorAll('.settings-button');
+
+  // Add a loading screen
+  const loadingScreen = document.createElement('div');
+  loadingScreen.id = 'loading-screen';
+  loadingScreen.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1F2937;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  `;
+  loadingScreen.innerHTML = '<div class="spinner"></div>';
+  document.body.appendChild(loadingScreen);
+
+  function showContent(paid) {
+    loadingScreen.style.display = 'none';
+    authScreen.style.display = 'none';
+    content.style.display = 'block';
+    if (!paid) {
+      // Disable functionality or show upgrade message
+    }
+  }
+
+  function showAuthButtons() {
+    loadingScreen.style.display = 'none';
+    authScreen.style.display = 'flex';
+    content.style.display = 'none';
+  }
+
+  extpay.getUser().then(user => {
+    if (user.paid) {
+      showContent(true);
+    } else {
+      showAuthButtons();
+    }
+  }).catch(error => {
+    console.error('Error getting user:', error);
+    showAuthButtons();
+  });
+
+  loginButton.addEventListener('click', () => {
+    extpay.openLoginPage();
+  });
+
+  signupButton.addEventListener('click', () => {
+    extpay.openPaymentPage();
+  });
+
+  settingsButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      extpay.openPaymentPage();
+    });
+  });
+
+  extpay.onPaid.addListener(user => {
+    showContent(true);
+  });
+
+  // Existing code starts here
   const generateButton = document.getElementById('generateTweet');
   console.log('Generate button:', generateButton);
 
@@ -351,10 +422,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function extractLinkContent(url) {
     try {
-      const response = await fetch(url);
-      const html = await response.text();
+      const response = await new Promise((resolve) => {
+        chrome.runtime.sendMessage({action: "fetchContent", url: url}, resolve);
+      });
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      // Parse the HTML content here in the popup context
       const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
+      const doc = parser.parseFromString(response.content, 'text/html');
       const content = doc.body.innerText;
       console.log('Extracted link content:', content.substring(0, 100) + '...');
       return content;
@@ -391,10 +467,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const systemMessage = `You are a professional Tweeter. Please generate tweets based on the given information. Here are your STRICT guidelines:
       1. Respond very concisely, less than 280 characters (per tweet), with no unnecessary fluff
-      2. Don't pander or be excessively ingratiating. NO EMOJIS, HASHTAGS, or exclamation points
-      3. Do NOT be unctuous
+      2. Don't pander or be excessively ingratiating. ABSOLUTELY NO EMOJIS, HASHTAGS, or exclamation points
+      3. Do NOT be unctuous but be interesting, unique, and DON'T be boring or dry.
       4. Tweet like a human who's tweeting. It doesn't need to be excessively formal. Be personable and informal. 
-      5. You can use a combination of first, second, or third person tense depending on what makes the most sense and the content provided`;
+      5. You can use a combination of second or third person tense depending on what makes the most sense and the content provided. But if the content is business or news related, use the third person tense.
+      6. DO NOT use the first person tense when reporting on news or business. You may only use the first person tense when writing a personal thought about the content in a unique or interesting way/perspective.`;
 
       const userPrompt = isSingleTweet
         ? `Please write a single 280 character tweet based on the content from the following content. Make sure to exclude content that is not relevant to broader message/article included below: ${content}${linkUrl ? ` Source link: ${linkUrl}` : ''}`

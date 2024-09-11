@@ -40,6 +40,7 @@ module.exports = {
         { from: "manifest.json", to: "manifest.json" },
         { from: "popup.html", to: "popup.html" },
         { from: "styles.css", to: "styles.css" },
+        { from: "node_modules/extpay/dist/ExtPay.js", to: "ExtPay.js" },
       ],
     }),
   ]

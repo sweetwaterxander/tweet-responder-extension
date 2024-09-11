@@ -9,75 +9,86 @@
 </head>
 <body>
   <div id="root" class="naval-tweet-responder">
-    <div class="card">
-      <div class="tab-header">
-        <button id="replyTab" class="tab-button active">Tweet Reply</button>
-        <button id="newTweetTab" class="tab-button">New Tweet</button>
+    <div id="auth-screen" class="auth-screen">
+      <h1 class="auth-title">Tweet Responder</h1>
+      <p class="auth-description">Generate intelligent responses to tweets</p>
+      <div id="auth-buttons" class="auth-buttons">
+        <button id="loginButton" class="auth-button">Login</button>
+        <button id="signupButton" class="auth-button">Sign Up</button>
       </div>
-      <div id="replyContent" class="card-content active">
-        <div class="card-header">
-          <h2 class="card-title">Tweet Responder</h2>
-          <button id="settingsButton" class="settings-button">
-            <i class="fas fa-cog"></i>
-            <span class="sr-only">Settings</span>
-          </button>
+    </div>
+    <div id="content" class="card" style="display: none;">
+      <div class="card">
+        <div class="tab-header">
+          <button id="replyTab" class="tab-button active">Tweet Reply</button>
+          <button id="newTweetTab" class="tab-button">New Tweet</button>
         </div>
-        <button id="generateTweet" class="generate-button">Generate Tweet</button>
-        <div class="textarea-container">
-          <textarea id="tweetResponse" readonly placeholder="Generated tweet will appear here..."></textarea>
-          <div id="loadingOverlay" class="loading-overlay">
-            <div class="spinner"></div>
+        <div id="replyContent" class="card-content active">
+          <div class="card-header">
+            <h2 class="card-title">Tweet Responder</h2>
+            <button id="settingsButton" class="settings-button">
+              <i class="fas fa-cog"></i>
+              <span class="sr-only">Settings</span>
+            </button>
           </div>
-        </div>
-        <div class="edit-buttons">
-          <button id="makeConcise" class="edit-button">Make more concise</button>
-          <button id="moreConservative" class="edit-button">More conservative</button>
-          <button id="moreLiberal" class="edit-button">More liberal</button>
-        </div>
-        <div class="edit-buttons">
-          <button id="moreUnique" class="edit-button">More unique</button>
-          <button id="moreContrarian" class="edit-button">More<br>contrarian</button>
-          <button id="moreAgreeable" class="edit-button">More agreeable</button>
-        </div>
-        <button id="copyToClipboard" class="copy-button">Copy to Clipboard</button>
-        <p id="error" class="error"></p>
-      </div>
-      <div id="newTweetContent" class="card-content">
-        <div class="card-header">
-          <h2 class="card-title">New Tweet</h2>
-          <button id="newTweetSettingsButton" class="settings-button">
-            <i class="fas fa-cog"></i>
-            <span class="sr-only">Settings</span>
-          </button>
-        </div>
-        <textarea id="pasteContent" placeholder="Paste your content here..."></textarea>
-        <input type="text" id="linkInput" placeholder="Or paste a link to an article...">
-        <div class="tweet-type-selector">
-          <button id="singleTweetButton" class="tweet-type-button active">Single Tweet</button>
-          <button id="threadButton" class="tweet-type-button">Thread</button>
-        </div>
-        <button id="generateNewTweet" class="generate-button">Generate Tweet</button>
-        <div class="textarea-container">
-          <textarea id="newTweetResponse" readonly placeholder="Generated tweet will appear here..."></textarea>
-          <div id="newTweetLoadingOverlay" class="loading-overlay">
-            <div class="spinner"></div>
+          <button id="generateTweet" class="generate-button">Generate Tweet</button>
+          <div class="textarea-container">
+            <textarea id="tweetResponse" readonly placeholder="Generated tweet will appear here..."></textarea>
+            <div id="loadingOverlay" class="loading-overlay">
+              <div class="spinner"></div>
+            </div>
           </div>
+          <div class="edit-buttons">
+            <button id="makeConcise" class="edit-button">Make more concise</button>
+            <button id="moreConservative" class="edit-button">More conservative</button>
+            <button id="moreLiberal" class="edit-button">More liberal</button>
+          </div>
+          <div class="edit-buttons">
+            <button id="moreUnique" class="edit-button">More unique</button>
+            <button id="moreContrarian" class="edit-button">More<br>contrarian</button>
+            <button id="moreAgreeable" class="edit-button">More agreeable</button>
+          </div>
+          <button id="copyToClipboard" class="copy-button">Copy to Clipboard</button>
+          <p id="error" class="error"></p>
         </div>
-        <div class="edit-buttons">
-          <button id="newMakeConcise" class="edit-button">Make more concise</button>
-          <button id="newMoreConservative" class="edit-button">More conservative</button>
-          <button id="newMoreLiberal" class="edit-button">More liberal</button>
+        <div id="newTweetContent" class="card-content">
+          <div class="card-header">
+            <h2 class="card-title">New Tweet</h2>
+            <button id="newTweetSettingsButton" class="settings-button">
+              <i class="fas fa-cog"></i>
+              <span class="sr-only">Settings</span>
+            </button>
+          </div>
+          <textarea id="pasteContent" placeholder="Paste your content here..."></textarea>
+          <input type="text" id="linkInput" placeholder="Or paste a link to an article...">
+          <div class="tweet-type-selector">
+            <button id="singleTweetButton" class="tweet-type-button active">Single Tweet</button>
+            <button id="threadButton" class="tweet-type-button">Thread</button>
+          </div>
+          <button id="generateNewTweet" class="generate-button">Generate Tweet</button>
+          <div class="textarea-container">
+            <textarea id="newTweetResponse" readonly placeholder="Generated tweet will appear here..."></textarea>
+            <div id="newTweetLoadingOverlay" class="loading-overlay">
+              <div class="spinner"></div>
+            </div>
+          </div>
+          <div class="edit-buttons">
+            <button id="newMakeConcise" class="edit-button">Make more concise</button>
+            <button id="newMoreConservative" class="edit-button">More conservative</button>
+            <button id="newMoreLiberal" class="edit-button">More liberal</button>
+          </div>
+          <div class="edit-buttons">
+            <button id="newMoreUnique" class="edit-button">More unique</button>
+            <button id="newMoreContrarian" class="edit-button">More<br>contrarian</button>
+            <button id="newMoreAgreeable" class="edit-button">More agreeable</button>
+          </div>
+          <button id="copyNewTweet" class="copy-button">Copy to Clipboard</button>
+          <p id="newTweetError" class="error"></p>
         </div>
-        <div class="edit-buttons">
-          <button id="newMoreUnique" class="edit-button">More unique</button>
-          <button id="newMoreContrarian" class="edit-button">More<br>contrarian</button>
-          <button id="newMoreAgreeable" class="edit-button">More agreeable</button>
-        </div>
-        <button id="copyNewTweet" class="copy-button">Copy to Clipboard</button>
-        <p id="newTweetError" class="error"></p>
       </div>
     </div>
   </div>
+  <script src="ExtPay.js"></script>
   <script src="popup.bundle.js"></script>
 </body>
 </html>

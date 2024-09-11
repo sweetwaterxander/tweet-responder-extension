@@ -1,5 +1,10 @@
 console.log('Background script loaded');
 
+importScripts('ExtPay.js');
+
+const extpay = ExtPay('x-generator'); // Replace with your actual extension ID
+extpay.startBackground();
+
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 let chatHistory = [];
@@ -31,8 +36,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("Editing new tweet with chat history:", request.chatHistory);
     editNewTweet(request.chatHistory, request.isSingleTweet).then(sendResponse);
     return true; // Indicates that the response is asynchronous
+  } else if (request.action === "fetchContent") {
+    fetch(request.url)
+      .then(response => response.text())
+      .then(html => {
+        // Instead of parsing the HTML, we'll send the raw HTML back to the popup
+        sendResponse({content: html});
+      })
+      .catch(error => sendResponse({error: error.message}));
+    return true;  // Will respond asynchronously
   }
 });
+
+function fetchContentFromPage(url) {
+  return new Promise((resolve, reject) => {
+    fetch(url)
+      .then(response => response.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        resolve(doc.body.innerText);
+      })
+      .catch(error => reject(error.message));
+  });
+}
 
 async function generateResponse(tweet) {
   console.log("Inside generateResponse function");
